@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dateien</title>
+</head>
+<body>
+    <h1>Verfügbare Dateien</h1>
+    <ul>
+        {% for item in files %}
+            {% if item.endswith('.pdf') %}
+                <li><a href="{{ url_for('download_file', filename=item) }}">{{ item }}</a></li>
+            {% else %}
+                <li>{{ item }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <a href="/">Zurück zur Startseite</a>
+</body>
+</html>
