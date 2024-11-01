@@ -4,38 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFs nach Kennzeichen</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>PDFs nach Kennzeichen</h1>
-        <form method="get" action="/">
-            <div class="form-group">
-                <input type="text" class="form-control" name="search" placeholder="Kennzeichen suchen (z.B. ABC-XY*)" value="{{ search_query }}">
-            </div>
-        </form>
-        <div id="license-plate-structure">
-            {% for license_plate, files in license_plate_structure.items() %}
-                <div class="card">
-                    <div class="card-header" data-toggle="collapse" data-target="#license-{{ license_plate }}">
-                        <strong>{{ license_plate }}</strong>
-                    </div>
-                    <div id="license-{{ license_plate }}" class="collapse">
-                        <ul class="list-group">
-                            {% for file in files %}
-                                <li class="list-group-item">
-                                    <a href="{{ url_for('send_pdf', filename=file['filename']) }}" target="_blank">
-                                        {{ file['filename'] }}
-                                    </a> - Endsumme: {{ file['total_amount'] }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+    <h1>PDF-Verwaltung nach Kennzeichen</h1>
+
+    <!-- Suchfeld für Kennzeichen -->
+    <form action="/search" method="get">
+        <label for="query">Kennzeichen oder FIN suchen:</label>
+        <input type="text" id="query" name="query" placeholder="B*123" required>
+        <button type="submit">Suchen</button>
+    </form>
+
+    <h2>Liste der PDFs</h2>
+
+    <!-- PDFs nach Kennzeichen anzeigen -->
+    {% if pdf_structure %}
+        <ul>
+            {% for license_plate, pdf_list in pdf_structure.items() %}
+                <li>
+                    <strong>Kennzeichen: {{ license_plate }}</strong>
+                    <ul>
+                        {% for pdf in pdf_list %}
+                            <li>
+                                <a href="{{ url_for('send_pdf', filename=pdf['filename']) }}" target="_blank">{{ pdf['filename'] }}</a>
+                                {% if pdf['total_amount'] %}
+                                    - Endsumme: {{ pdf['total_amount'] }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
             {% endfor %}
-        </div>
-    </div>
+        </ul>
+    {% else %}
+        <p>Keine PDFs gefunden.</p>
+    {% endif %}
 </body>
 </html>
