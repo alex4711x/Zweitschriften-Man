@@ -3,42 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDFs nach Kennzeichen</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <title>KüS Zweitschriften</title>
 </head>
 <body>
-    <h1>PDF-Verwaltung nach Kennzeichen</h1>
+    <h1>KüS Zweitschriften</h1>
 
-    <!-- Suchfeld für Kennzeichen -->
-    <form action="/search" method="get">
-        <label for="query">Kennzeichen oder FIN suchen:</label>
-        <input type="text" id="query" name="query" placeholder="B*123" required>
-        <button type="submit">Suchen</button>
-    </form>
-
-    <h2>Liste der PDFs</h2>
-
-    <!-- PDFs nach Kennzeichen anzeigen -->
-    {% if pdf_structure %}
-        <ul>
-            {% for license_plate, pdf_list in pdf_structure.items() %}
-                <li>
-                    <strong>Kennzeichen: {{ license_plate }}</strong>
-                    <ul>
-                        {% for pdf in pdf_list %}
-                            <li>
-                                <a href="{{ url_for('send_pdf', filename=pdf['filename']) }}" target="_blank">{{ pdf['filename'] }}</a>
-                                {% if pdf['total_amount'] %}
-                                    - Endsumme: {{ pdf['total_amount'] }}
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
+    <h2>Letzte E-Mail PDF-Downloads</h2>
+    {% if download_count > 0 %}
+        <p>Neue PDFs wurden heruntergeladen: {{ download_count }}. Duplikate: {{ duplicate_count }}</p>
     {% else %}
-        <p>Keine PDFs gefunden.</p>
+        <p>Keine neuen PDFs gefunden.</p>
     {% endif %}
+
+    <h2>PDFs nach Kennzeichen</h2>
+    <ul>
+        {% for license_plate, files in license_plate_structure.items() %}
+            <li>{{ license_plate }}
+                <ul>
+                    {% for file in files %}
+                        <li><a href="{{ url_for('send_pdf', filename=file['filename']) }}">{{ file['filename'] }}</a> (Endsumme: {{ file['total_amount'] }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>PDFs nach Datum</h2>
+    <ul>
+        {% for year, months in pdf_structure.items() %}
+            <li>{{ year }}
+                <ul>
+                    {% for month, days in months.items() %}
+                        <li>{{ month }}
+                            <ul>
+                                {% for day, files in days.items() %}
+                                    <li>{{ day }}
+                                        <ul>
+                                            {% for file in files %}
+                                                <li><a href="{{ url_for('send_pdf', filename=file['filename']) }}">{{ file['filename'] }}</a> (Endsumme: {{ file['total_amount'] }})</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
 </body>
 </html>
